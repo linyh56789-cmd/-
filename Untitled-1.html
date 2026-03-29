@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL语句详细解释 - 数据库课程设计</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+        
+        .sql-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .sql-item {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+        
+        .sql-item:hover {
+            background-color: #f5f9ff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.2);
+        }
+        
+        .sql-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .sql-number {
+            background-color: var(--secondary-color);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .sql-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .original-code {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .original-code::before {
+            content: '原代码';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 0 0 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .explanation {
+            background-color: #f1f2f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .explanation h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .explanation ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .explanation li {
+            margin-bottom: 8px;
+        }
+        
+        .keyword {
+            background-color: #ffeaa7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #d35400;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .download-section {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .download-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .download-btn:hover {
+            background-color: white;
+            color: #e74c3c;
+            border-color: #e74c3c;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .tip-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+        
+        .tip-title {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: #ff9800;
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #7f8c8d;
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>数据库课程设计：SQL语句详解</h1>
+        <p class="subtitle">91个SQL语句的逐字解释，包含原代码、关键字说明和功能描述，特别为SQL初学者设计</p>
+    </header>
+    
+    <div class="container">
+        <main class="sql-container">
+            <!-- 示例解释项 (实际中会有91个) -->
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">1</div>
+                    <h2 class="sql-title">创建学生表</h2>
+                </div>
+                
+                <div class="original-code">
+CREATE TABLE T_STUDENT (
+    STUNO VARCHAR2(16) PRIMARY KEY,
+    STUNAME VARCHAR2(16) NOT NULL,
+    STUSEX VARCHAR2(6),
+    STUBIR DATE
+);
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">CREATE TABLE</span>：创建新表</li>
+                        <li><span class="keyword">VARCHAR2(16)</span>：可变长度字符串，最大16字符</li>
+                        <li><span class="keyword">PRIMARY KEY</span>：定义主键，唯一标识每条记录</li>
+                        <li><span class="keyword">NOT NULL</span>：约束该列不能为空</li>
+                        <li><span class="keyword">DATE</span>：日期类型，存储出生日期</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>创建一个名为T_STUDENT的学生表，包含学号、姓名、性别和出生日期四个字段。其中学号是主键，姓名不能为空。</p>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">2</div>
+                    <h2 class="sql-title">查询所有学生数据</h2>
+                </div>
+                
+                <div class="original-code">
+SELECT * FROM T_STUDENT;
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">SELECT</span>：用于从数据库中选择数据</li>
+                        <li><span class="keyword">*</span>：通配符，表示所有列</li>
+                        <li><span class="keyword">FROM</span>：指定要查询的表</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>检索T_STUDENT表中的所有记录和所有列，返回完整的学籍信息。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">初学者提示：</div>
+                        <p>这是SQL中最基本的查询语句，适合快速查看表的所有内容。在生产环境中，建议明确指定列名而不是使用*，以提高查询效率和可读性。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">10</div>
+                    <h2 class="sql-title">查询女生姓名</h2>
+                </div>
+                
+                <div class="original-code">
+SELECT STUNAME AS "姓名"
+FROM T_STUDENT
+WHERE STUSEX = '女';
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">AS</span>：为列指定别名（显示名称）</li>
+                        <li><span class="keyword">WHERE</span>：条件过滤，筛选满足条件的记录</li>
+                        <li><span class="keyword">'女'</span>：字符串常量，需要用单引号包围</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>从学生表中筛选出性别为"女"的学生，并只返回她们的姓名列，且列标题显示为"姓名"。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">初学者提示：</div>
+                        <p>WHERE子句是SQL查询中最重要的部分之一，允许您根据特定条件过滤结果。注意字符串值必须用单引号包围。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">26</div>
+                    <h2 class="sql-title">计算学生总评成绩</h2>
+                </div>
+                
+                <div class="original-code">
+SELECT
+    S002_C001_SCORES."期中成绩",
+    S002_C001_SCORES."期末成绩",
+    (S002_C001_SCORES."期中成绩" * 0.4 + 
+     S002_C001_SCORES."期末成绩" * 0.6) AS "总评成绩"
+FROM (
+    SELECT STUNO, COURSENO, TYPE, SCORE
+    FROM T_SCORE
+    WHERE STUNO = 'S002' 
+        AND COURSENO = 'C001' 
+        AND TYPE IN ('期中', '期末')
+PIVOT (
+    MAX(SCORE)
+    FOR TYPE IN ('期中' AS "期中成绩", '期末' AS "期末成绩")
+) S002_C001_SCORES;
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">PIVOT</span>：行转列操作，将多行数据转换为单行</li>
+                        <li><span class="keyword">SUBQUERY</span>：嵌套在FROM中的子查询</li>
+                        <li><span class="keyword">MAX(SCORE)</span>：聚合函数，取最大值</li>
+                        <li><span class="keyword">AS</span>：为计算列指定别名</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>查询学号S002在课程C001的期中、期末成绩，并计算总评成绩（期中占40%，期末占60%）。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">高级技巧：</div>
+                        <p>PIVOT操作是Oracle特有的功能，用于将行数据转换为列，特别适合需要横向展示多个相关值的场景。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">35</div>
+                    <h2 class="sql-title">查询教授的学生</h2>
+                </div>
+                
+                <div class="original-code">
+SELECT DISTINCT s.STUNAME AS "学生姓名"
+FROM T_TEACHER t
+INNER JOIN T_COURSE c ON t.TEANO = c.TEANO
+INNER JOIN T_SCORE sc ON c.COURSENO = sc.COURSENO
+INNER JOIN T_STUDENT s ON sc.STUNO = s.STUNO
+WHERE t.TEATITLE = '教授';
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">DISTINCT</span>：去除重复行</li>
+                        <li><span class="keyword">INNER JOIN</span>：内连接，基于关联字段合并表</li>
+                        <li><span class="keyword">ON</span>：指定表连接的条件</li>
+                        <li><span class="keyword">AS</span>：为列指定别名</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>查询所有教授教过的学生姓名，通过教师表、课程表、成绩表和学生表的四表连接实现。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">多表连接技巧：</div>
+                        <p>多表连接时，建议从核心表开始，逐步添加关联表。使用表别名（如t、c）可以提高查询可读性。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">48</div>
+                    <h2 class="sql-title">教师授课数量统计</h2>
+                </div>
+                
+                <div class="original-code">
+SELECT
+    t.TEANAME AS "教师姓名",
+    COUNT(c.COURSENO) AS "讲授课程数量"
+FROM T_TEACHER t
+LEFT JOIN T_COURSE c ON t.TEANO = c.TEANO
+GROUP BY t.TEANO, t.TEANAME
+ORDER BY "讲授课程数量" DESC, t.TEANAME ASC;
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">COUNT()</span>：聚合函数，统计行数</li>
+                        <li><span class="keyword">LEFT JOIN</span>：左连接，包含左表所有记录</li>
+                        <li><span class="keyword">GROUP BY</span>：分组统计，常与聚合函数一起使用</li>
+                        <li><span class="keyword">ORDER BY</span>：结果排序，DESC降序，ASC升序</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>统计每位教师讲授的课程数量，包括没有授课的教师（课程数为0），按授课数量降序、教师姓名升序排列。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">初学者提示：</div>
+                        <p>GROUP BY子句中必须包含SELECT列表中的所有非聚合列。LEFT JOIN确保即使没有授课记录的教师也会被包含在结果中。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">63</div>
+                    <h2 class="sql-title">创建员工工资表</h2>
+                </div>
+                
+                <div class="original-code">
+CREATE TABLE EMP_SALARY (
+    EMPNO VARCHAR2(16) PRIMARY KEY,
+    EMPNAME VARCHAR2(16),
+    EMPSEX VARCHAR2(6) DEFAULT '男',
+    EMPBIR DATE,
+    SALARY NUMBER
+);
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">CREATE TABLE</span>：创建新表</li>
+                        <li><span class="keyword">PRIMARY KEY</span>：定义主键约束</li>
+                        <li><span class="keyword">DEFAULT</span>：指定列的默认值</li>
+                        <li><span class="keyword">VARCHAR2</span>：可变长度字符串</li>
+                        <li><span class="keyword">NUMBER</span>：数值类型，适合存储工资</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>创建一个员工工资表，包含员工编号、姓名、性别、出生日期和工资字段。其中员工编号是主键，性别默认为'男'。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">表设计原则：</div>
+                        <p>在创建表时，合理选择数据类型和约束条件非常重要。DEFAULT约束可以减少数据插入时的工作量。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sql-item">
+                <div class="sql-header">
+                    <div class="sql-number">80</div>
+                    <h2 class="sql-title">计算平均分并存储</h2>
+                </div>
+                
+                <div class="original-code">
+DECLARE
+    avascore NUMBER;
+BEGIN
+    SELECT AVG(SCORE) INTO avascore FROM T_SCORE;
+    DBMS_OUTPUT.PUT_LINE('平均分：' || avascore);
+END;
+                </div>
+                
+                <div class="explanation">
+                    <h3>关键字解释：</h3>
+                    <ul>
+                        <li><span class="keyword">DECLARE</span>：声明变量</li>
+                        <li><span class="keyword">BEGIN</span>：PL/SQL块开始</li>
+                        <li><span class="keyword">INTO</span>：将查询结果存储到变量</li>
+                        <li><span class="keyword">DBMS_OUTPUT.PUT_LINE</span>：输出结果</li>
+                        <li><span class="keyword">END</span>：PL/SQL块结束</li>
+                    </ul>
+                    
+                    <h3>功能说明：</h3>
+                    <p>使用PL/SQL块计算全校学生的平均分数，并将结果存储在变量中，然后打印输出。</p>
+                    
+                    <div class="tip-box">
+                        <div class="tip-title">PL/SQL基础：</div>
+                        <p>这是Oracle的存储过程语言，用于编写数据库程序逻辑。在SQL*Plus或SQL Developer中执行前，需要先执行SET SERVEROUTPUT ON;以启用输出。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 更多SQL解释项 -->
+            <div class="tip-box">
+                <div class="tip-title">说明：</div>
+                <p>以上展示了8个SQL语句的详细解释作为示例。完整版包含91个SQL语句的详细解释，包括表创建、数据查询、数据操作、表修改、视图创建、权限管理等各个方面。</p>
+            </div>
+        </main>
+        
+        <aside class="sidebar">
+            <h2>SQL学习指南</h2>
+            <div class="tip-box">
+                <div class="tip-title">SQL基础知识：</div>
+                <ul>
+                    <li>SELECT - 数据查询</li>
+                    <li>INSERT/UPDATE/DELETE - 数据操作</li>
+                    <li>CREATE/ALTER/DROP - 对象定义</li>
+                    <li>JOIN - 表连接</li>
+                    <li>GROUP BY - 数据分组</li>
+                </ul>
+            </div>
+            
+            <div class="tip-box">
+                <div class="tip-title">关键概念：</div>
+                <ul>
+                    <li>主键 (PRIMARY KEY)</li>
+                    <li>外键 (FOREIGN KEY)</li>
+                    <li>约束 (CONSTRAINTS)</li>
+                    <li>索引 (INDEXES)</li>
+                    <li>视图 (VIEWS)</li>
+                    <li>事务 (TRANSACTIONS)</li>
+                </ul>
+            </div>
+            
+            <div class="tip-box">
+                <div class="tip-title">最佳实践：</div>
+                <ul>
+                    <li>总是为列指定别名</li>
+                    <li>使用明确的JOIN条件</li>
+                    <li>避免SELECT *</li>
+                    <li>合理使用索引</li>
+                    <li>重要操作前备份数据</li>
+                </ul>
+            </div>
+            
+            <div class="download-section">
+                <h3>获取完整SQL解释文档</h3>
+                <p>包含全部91个SQL语句的详细解释</p>
+                <a href="#" class="download-btn">下载完整文档 (PDF)</a>
+                <p style="margin-top: 15px; font-size: 0.9em;">文件大小: 约850KB</p>
+            </div>
+        </aside>
+    </div>
+    
+    <footer>
+        <p>数据库课程设计 - SQL语句详解 &copy; 2023 | 为初学者设计的SQL学习资源</p>
+    </footer>
+</body>
+</html>
